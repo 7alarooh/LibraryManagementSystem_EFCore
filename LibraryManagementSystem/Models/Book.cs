@@ -43,5 +43,7 @@ namespace LibraryManagementSystem.Models
 
         // Navigation property to Category table
         public Category Category { get; set; }
-        }
+        public virtual ICollection<Borrowing> Borrowings { get; set; }
+
+    }
 }

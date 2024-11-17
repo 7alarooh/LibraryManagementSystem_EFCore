@@ -26,7 +26,7 @@ namespace LibraryManagementSystem.Models
         [Required]
         [EnumDataType(typeof(Gender), ErrorMessage = "Invalid gender.")]
         public Gender Gender { get; set; } // Gender of the user (e.g., Male, Female)
-
+        public virtual ICollection<Borrowing> Borrowings { get; set; }
         [Required]
         [StringLength(255, ErrorMessage = "Passcode cannot exceed 255 characters.")]
         public string Passcode { get; set; } // User's passcode for login
