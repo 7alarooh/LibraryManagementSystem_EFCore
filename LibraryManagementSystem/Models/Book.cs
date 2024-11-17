@@ -37,5 +37,11 @@ namespace LibraryManagementSystem.Models
         [Required]
         [Range(1, 365)] // Borrowing period range (1 to 365 days)
         public int AllowedBorrowingPeriod { get; set; } // Allowed borrowing period in days
-    }
+                                                        // Foreign Key for Category
+        [ForeignKey("Category")]
+        public int CategoryID { get; set; } // Foreign Key to Category table
+
+        // Navigation property to Category table
+        public Category Category { get; set; }
+        }
 }
