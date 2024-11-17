@@ -45,5 +45,6 @@ namespace LibraryManagementSystem.Models
         public Category Category { get; set; }
         public virtual ICollection<Borrowing> Borrowings { get; set; }
 
+        public virtual ICollection<Purchase> Purchases { get; set; }
     }
 }

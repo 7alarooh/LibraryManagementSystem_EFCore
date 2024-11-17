@@ -21,7 +21,7 @@ namespace LibraryManagementSystem.Models
         [Required]
         [Range(0, int.MaxValue, ErrorMessage = "Number of books cannot be negative.")]
         public int NumberOfBooks { get; set; } // Total number of books in the category
-        // Navigation property to related books
+          // Navigation property to related books
         public ICollection<Book> Books { get; set; }
     }
 }

@@ -30,5 +30,8 @@ namespace LibraryManagementSystem.Models
         [Required]
         [StringLength(255, ErrorMessage = "Passcode cannot exceed 255 characters.")]
         public string Passcode { get; set; } // User's passcode for login
+
+        public virtual ICollection<Purchase> Purchases { get; set; }
     }
 }
+

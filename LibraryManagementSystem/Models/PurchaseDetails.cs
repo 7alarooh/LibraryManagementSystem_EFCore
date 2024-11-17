@@ -27,5 +27,7 @@ namespace LibraryManagementSystem.Models
         // Navigation properties
         public Purchase Purchase { get; set; }
         public Book Book { get; set; }
+        public virtual ICollection<Book> Books { get; set; }
     }
 }
+

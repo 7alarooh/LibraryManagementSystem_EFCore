@@ -27,5 +27,7 @@ namespace LibraryManagementSystem.Models
 
         // Navigation property
         public User User { get; set; }
+        public virtual ICollection<User> Users { get; set; }
     }
 }
+
