@@ -39,7 +39,7 @@ namespace LibraryManagementSystem.Models
         public int AllowedBorrowingPeriod { get; set; } // Allowed borrowing period in days
                                                         // Foreign Key for Category
         [ForeignKey("Category")]
-        public int CategoryID { get; set; } // Foreign Key to Category table
+        public int? CategoryID { get; set; } // Foreign Key to Category table
 
         // Navigation property to Category table
         public Category Category { get; set; }
