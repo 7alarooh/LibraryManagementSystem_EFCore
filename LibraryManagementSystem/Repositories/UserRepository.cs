@@ -15,5 +15,10 @@ namespace LibraryManagementSystem.Repositories
         {
             return _context.Users.Count(u => u.Gender == gender);
         }
+        public void AddUser(User user)
+        {
+            _context.Users.Add(user);  // Add user directly to the DbContext
+            _context.SaveChanges();    // Save changes to the database
+        }
     }
 }

@@ -15,7 +15,17 @@ namespace LibraryManagementSystem.Repositories
         {
             _context = context;
         }
+        // Add method for adding an entity
+        public void Add(T entity)
+        {
+            _context.Set<T>().Add(entity); // Add the entity to the DbSet
+        }
 
+        // Save changes to the context (commit to the database)
+        public void SaveChanges()
+        {
+            _context.SaveChanges(); // Commit changes to the database
+        }
         public IEnumerable<T> GetAll()
         {
             return _context.Set<T>().ToList();
