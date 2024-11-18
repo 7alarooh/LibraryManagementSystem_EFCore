@@ -1,10 +1,16 @@
-﻿namespace LibraryManagementSystem
+﻿using System;
+using System.Linq;
+using System.Text.RegularExpressions;
+using LibraryManagementSystem.Models;
+
+namespace LibraryManagementSystem
 {
-    internal class Program
+    public class Program
     {
+
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
         }
+
     }
 }
