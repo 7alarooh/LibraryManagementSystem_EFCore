@@ -20,7 +20,7 @@ namespace LibraryManagementSystem.Models
         public int UserID { get; set; } // Primary Key with auto-increment
 
         [Required]
-        [StringLength(255, ErrorMessage = "User name cannot exceed 255 characters.")]
+        [MaxLength(50,ErrorMessage = "User name cannot exceed 50 characters.")]
         public string UName { get; set; } // User's name
 
         [Required]
@@ -28,7 +28,7 @@ namespace LibraryManagementSystem.Models
         public Gender Gender { get; set; } // Gender of the user (e.g., Male, Female)
         public virtual ICollection<Borrowing> Borrowings { get; set; }
         [Required]
-        [StringLength(255, ErrorMessage = "Passcode cannot exceed 255 characters.")]
+        [MaxLength(20, ErrorMessage = "Passcode cannot exceed 20 characters.")]
         public string Passcode { get; set; } // User's passcode for login
 
         public virtual ICollection<Purchase> Purchases { get; set; }

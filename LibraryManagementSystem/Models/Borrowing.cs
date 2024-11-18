@@ -18,7 +18,7 @@ namespace LibraryManagementSystem.Models
         public DateTime BorrowingDate { get; set; } // Date when the book is borrowed
 
         public DateTime? ActualReturnDate { get; set; } // Date when the book is actually returned (nullable)
-
+        
         public int? Rating { get; set; } // Rating given by the user for the borrowed book
 
         public bool IsReturned { get; set; } // Flag indicating whether the book has been returned
@@ -39,7 +39,7 @@ namespace LibraryManagementSystem.Models
 
 
         // Derived Attribute - Predicted Return Date
-        [NotMapped] // This is not stored in the database, it's just for calculation
+        [Required]
         public DateTime PredictedReturnDate
         {
             get
