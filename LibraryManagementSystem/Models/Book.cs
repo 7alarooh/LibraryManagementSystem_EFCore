@@ -40,7 +40,9 @@ namespace LibraryManagementSystem.Models
                                                         // Foreign Key for Category
         [ForeignKey("Category")]
         public int? CategoryID { get; set; } // Foreign Key to Category table
-
+        // Rating Property
+        [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5.")]
+        public decimal Rating { get; set; } // Rating of the book (1-5)
         // Navigation property to Category table
         public Category Category { get; set; }
         public virtual ICollection<Borrowing> Borrowings { get; set; }
