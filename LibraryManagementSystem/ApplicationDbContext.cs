@@ -43,6 +43,11 @@ namespace LibraryManagementSystem
                 .HasOne(b => b.Category)
                 .WithMany(c => c.Books)
                 .HasForeignKey(b => b.CategoryID);
+
+            // Explicitly specify the primary key if not following conventions
+            modelBuilder.Entity<User>().HasKey(u => u.UserID);
+
+            base.OnModelCreating(modelBuilder);
         }
 
     }
