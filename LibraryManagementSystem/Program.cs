@@ -7,28 +7,7 @@ using LibraryManagementSystem.Models;
 using LibraryManagementSystem.Repositories;
 
 namespace LibraryManagementSystem
-{
-    public class Admin
-    {
-        public int AdminID { get; set; }
-        public string AName { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
-    public enum Gender
-    {
-        Male,
-        Female,
-        Other
-    }
-    public class User
-    {
-        public int UID { get; set; }
-        public string Uname { get; set; }
-        public string Email { get; set; }
-        public Gender Gender { get; set; } // Enum type
-        public string Passcode { get; set; }
-    }
+{   
     public class Program
     {
         static int index = -1;
@@ -105,7 +84,7 @@ namespace LibraryManagementSystem
                         // Convert UID to integer and find the user
                         if (int.TryParse(uUID, out int uIDValue))
                         {
-                            var user = userRepository.GetAll().FirstOrDefault(u => u.UID == uIDValue); // Assuming `userRepository` is accessible
+                            var user = userRepository.GetAllUsers().FirstOrDefault(u => u.UserID == uIDValue); // Assuming `userRepository` is accessible
 
                             if (user != null)
                             {
@@ -140,6 +119,8 @@ namespace LibraryManagementSystem
                         ExitFlag = true; // Exit the loop
                         break;
                     case "0":
+                        AddAdmin( adminRepository);
+                        ViewAllUsers(adminRepository, userRepository);
                         break;
 
                     default:
@@ -201,9 +182,7 @@ namespace LibraryManagementSystem
         }
         static void userMenu(User user)
         {
-            // Example function for user menu
-            Console.WriteLine($"Welcome {user.Uname} to the User Menu.");
-            // Add more user operations here
+            Console.WriteLine($"Welcome {user.UName} to the User Menu.");
         }
         static void accountsManagement(int adminID, string adminName, AdminRepository adminRepository, UserRepository userRepository)
         {
@@ -304,7 +283,7 @@ namespace LibraryManagementSystem
             // Validate user inputs using DataAnnotations
             var newUser = new User
             {
-                Uname = userName,
+                UName = userName,
                 Gender = gender,
                 Passcode = passcode
             };
@@ -323,7 +302,7 @@ namespace LibraryManagementSystem
             }
 
             // If validation passes, add user to the database
-            userRepository.AddUser(newUser); // Use the AddUser method we created
+            userRepository.InsertUser(newUser); // Use the AddUser method we created
             userRepository.SaveChanges();
 
             Console.WriteLine("User added successfully.");
@@ -374,7 +353,7 @@ namespace LibraryManagementSystem
             }
 
             // If validation passes, add admin to the database
-            adminRepository.Add(newAdmin);
+            adminRepository.AddAdmin(newAdmin);
             adminRepository.SaveChanges(); // Save changes to the database
             Console.WriteLine("Admin added successfully.");
         }
@@ -415,7 +394,7 @@ namespace LibraryManagementSystem
         static void ViewAllUsers(AdminRepository adminRepository, UserRepository userRepository)
         {
             List<Admin> Admins = new List<Admin>();  // Declare it somewhere in your class or program.
-            var admins = adminRepository.GetAll(); // Example fetching all admins from repository
+            var admins = adminRepository.GetAllAdmins(); // Example fetching all admins from repository
 
             // Use StringBuilder for efficient string concatenation
             StringBuilder sb = new StringBuilder();
@@ -438,7 +417,7 @@ namespace LibraryManagementSystem
             sb.AppendLine(new string('-', idWidth + nameWidth + emailWidth + passwordWidth + 12)); // Separator line
 
             // Assuming 'Admins' is a list of admin objects, iterate over them
-            foreach (var admin in Admins)
+            foreach (var admin in admins)
             {
                 sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + nameWidth + "} {2,-" + emailWidth + "} {3,-" + passwordWidth + "}",
                                 admin.AdminID,    // Assuming Admin has AdminID
@@ -448,21 +427,20 @@ namespace LibraryManagementSystem
                 sb.AppendLine();
             }
             List<User> Users = new List<User>();  // Declare it somewhere in your class or program.
-            var users = userRepository.GetAll();
+            var users = userRepository.GetAllUsers();
             // Print Users
             sb.AppendLine("\n\n\t--- Users ---");
             sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + nameWidth + "} {2,-" + emailWidth + "} {3,-" + passwordWidth + "}",
                             "ID", "Name", "Email", "Password");
             sb.AppendLine();
-            sb.AppendLine(new string('-', idWidth + nameWidth + emailWidth + passwordWidth + 12)); // Separator line
+            sb.AppendLine(new string('-', idWidth + nameWidth + passwordWidth + 12)); // Separator line
 
             // Assuming 'Users' is a list of user objects, iterate over them
             foreach (var user in users)
             {
-                sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + nameWidth + "} {2,-" + emailWidth + "} {3,-" + passwordWidth + "}",
-                                user.UID,         // Assuming User has UID
-                                user.Uname,       // User name
-                                user.Email,       // User email
+                sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + nameWidth + "} {2,-" + passwordWidth + "}",
+                                user.UserID,         // Assuming User has UID
+                                user.UName,       // User name
                                 user.Passcode);   // User passcode
                 sb.AppendLine();
             }

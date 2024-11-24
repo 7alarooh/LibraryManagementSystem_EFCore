@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace LibraryManagementSystem.Repositories
 {
-    public class AdminRepository : Repository<Admin>
+    public class AdminRepository
     {
-        public AdminRepository(ApplicationDbContext context) : base(context) { }
+        private readonly ApplicationDbContext _context;
+        public AdminRepository(ApplicationDbContext context)  { _context = context; }
 
         // You can add specific methods related to Admin here if needed, for example:
 
@@ -28,6 +29,56 @@ namespace LibraryManagementSystem.Repositories
                 admin.Password = newPassword;
                 _context.SaveChanges();
             }
+        }
+
+        public void AddAdmin(Admin admin)
+        {
+            _context.Admins.Add(admin);
+            _context.SaveChanges();
+        }
+
+        public void DeleteAdmin(Admin adminID)
+        {
+            var admin = _context.Admins.Find(adminID);
+            if (admin != null)
+            {
+                _context.Admins.Remove(admin);
+                _context.SaveChanges();
+            }
+            else
+            {
+                Console.WriteLine("User not found.");
+            }
+        }
+        // Update
+        public void UpdateAdmin (Admin updatedAdmin)
+        {
+            var existingAdmin = _context.Admins.Find(updatedAdmin.AdminID);
+            if (existingAdmin != null)
+            {
+                existingAdmin.AName = updatedAdmin.AName;
+                existingAdmin.Email = updatedAdmin.Email;
+                existingAdmin.Password = updatedAdmin.Password;
+
+                // Update other fields if needed
+                _context.SaveChanges();
+            }
+            else
+            {
+                Console.WriteLine("User not found.");
+            }
+        }
+        public void InsertAdmin(Admin admin)
+        {
+            _context.Admins.Add(admin);
+        }
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
+        }
+        public List<Admin> GetAllAdmins()
+        {
+            return _context.Admins.ToList();
         }
 
         // Method to count the total number of admins
