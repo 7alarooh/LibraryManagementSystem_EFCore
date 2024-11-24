@@ -381,7 +381,7 @@ namespace LibraryManagementSystem
             switch (accountType)
             {
                 case "user":
-                 //   EditUser();
+                   EditUser(userRepository);
                     break;
                 case "admin":
                     //EditAdmin();
@@ -390,6 +390,69 @@ namespace LibraryManagementSystem
                     Console.WriteLine("Error: Invalid account type. Please enter 'user' or 'admin'.");
                     break;
             }
+        }
+        public static void EditUser(UserRepository userRepository)
+        {
+            Console.WriteLine("Enter the User ID to edit:");
+            if (!int.TryParse(Console.ReadLine(), out int userId))
+            {
+                Console.WriteLine("Invalid User ID. Please enter a valid number.");
+                return;
+            }
+
+            // Retrieve the user from the database
+            var user = userRepository.GetAllUsers().Find(u => u.UserID == userId);
+            if (user == null)
+            {
+                Console.WriteLine("User not found.");
+                return;
+            }
+
+            // Display current user information
+            Console.WriteLine($"Editing User: {user.UName}");
+            Console.WriteLine("Current Details:");
+            Console.WriteLine($"1. Name: {user.UName}");
+            Console.WriteLine($"2. Gender: {user.Gender}");
+            Console.WriteLine($"3. Passcode: {user.Passcode}");
+
+            // Prompt for new details
+            Console.WriteLine("Enter new name (or press Enter to keep unchanged):");
+            string newName = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(newName) && newName.Length <= 50)
+            {
+                user.UName = newName;
+            }
+            else if (!string.IsNullOrWhiteSpace(newName))
+            {
+                Console.WriteLine("Name exceeds 50 characters. Changes discarded.");
+            }
+
+            Console.WriteLine("Enter new gender (Male/Female or press Enter to keep unchanged):");
+            string newGenderInput = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(newGenderInput) &&
+                Enum.TryParse(newGenderInput, true, out Gender newGender))
+            {
+                user.Gender = newGender;
+            }
+            else if (!string.IsNullOrWhiteSpace(newGenderInput))
+            {
+                Console.WriteLine("Invalid gender. Changes discarded.");
+            }
+
+            Console.WriteLine("Enter new passcode (max 20 characters or press Enter to keep unchanged):");
+            string newPasscode = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(newPasscode) && newPasscode.Length <= 20)
+            {
+                user.Passcode = newPasscode;
+            }
+            else if (!string.IsNullOrWhiteSpace(newPasscode))
+            {
+                Console.WriteLine("Passcode exceeds 20 characters. Changes discarded.");
+            }
+
+            // Update the user in the database
+            userRepository.UpdateUser(user);
+            Console.WriteLine("User details updated successfully.");
         }
         static void ViewAllUsers(AdminRepository adminRepository, UserRepository userRepository)
         {
