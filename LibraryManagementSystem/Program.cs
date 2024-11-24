@@ -384,7 +384,7 @@ namespace LibraryManagementSystem
                    EditUser(userRepository);
                     break;
                 case "admin":
-                    //EditAdmin();
+                    EditAdmin(adminRepository);
                     break;
                 default:
                     Console.WriteLine("Error: Invalid account type. Please enter 'user' or 'admin'.");
@@ -453,6 +453,85 @@ namespace LibraryManagementSystem
             // Update the user in the database
             userRepository.UpdateUser(user);
             Console.WriteLine("User details updated successfully.");
+        }
+        public static void EditAdmin(AdminRepository adminRepository)
+        {
+            Console.WriteLine("Enter the Admin ID to edit:");
+            if (!int.TryParse(Console.ReadLine(), out int adminId))
+            {
+                Console.WriteLine("Invalid Admin ID. Please enter a valid number.");
+                return;
+            }
+
+            // Retrieve the admin from the database
+            var admin = adminRepository.GetAllAdmins().Find(a => a.AdminID == adminId);
+            if (admin == null)
+            {
+                Console.WriteLine("Admin not found.");
+                return;
+            }
+
+            // Display current admin information
+            Console.WriteLine($"Editing Admin: {admin.AName}");
+            Console.WriteLine("Current Details:");
+            Console.WriteLine($"1. Name: {admin.AName}");
+            Console.WriteLine($"2. Email: {admin.Email}");
+            Console.WriteLine($"3. Password: {new string('*', admin.Password.Length)}");
+
+            // Prompt for new details
+            Console.WriteLine("Enter new name (or press Enter to keep unchanged):");
+            string newName = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(newName) && newName.Length <= 255)
+            {
+                admin.AName = newName;
+            }
+            else if (!string.IsNullOrWhiteSpace(newName))
+            {
+                Console.WriteLine("Name exceeds 255 characters. Changes discarded.");
+            }
+
+            Console.WriteLine("Enter new email (or press Enter to keep unchanged):");
+            string newEmail = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(newEmail))
+            {
+                if (newEmail.Length <= 255 && IsValidEmail(newEmail))
+                {
+                    admin.Email = newEmail;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid email format or length exceeds 255 characters. Changes discarded.");
+                }
+            }
+
+            Console.WriteLine("Enter new password (or press Enter to keep unchanged):");
+            string newPassword = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(newPassword) && newPassword.Length <= 255)
+            {
+                admin.Password = newPassword;
+            }
+            else if (!string.IsNullOrWhiteSpace(newPassword))
+            {
+                Console.WriteLine("Password exceeds 255 characters. Changes discarded.");
+            }
+
+            // Update the admin in the database
+            adminRepository.UpdateAdmin(admin);
+            Console.WriteLine("Admin details updated successfully.");
+        }
+
+        // Helper function to validate email format
+        public static bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
         }
         static void ViewAllUsers(AdminRepository adminRepository, UserRepository userRepository)
         {
