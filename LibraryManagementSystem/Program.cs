@@ -21,10 +21,10 @@ namespace LibraryManagementSystem
             var purchaseRepository = new PurchaseRepository(dbContext);
             var userRepository = new UserRepository(dbContext);
 
-            loginPage(adminRepository, userRepository);
+            loginPage(adminRepository, userRepository, bookRepository, categoryRepository);
         }
         //
-        static void loginPage(AdminRepository adminRepository, UserRepository userRepository)
+        static void loginPage(AdminRepository adminRepository, UserRepository userRepository , BookRepository bookRepository, CategoryRepository categoryRepository)
         {
             bool ExitFlag = false;
             do
@@ -56,7 +56,7 @@ namespace LibraryManagementSystem
                             if (enterPW == admin.Password)
                             {
                                 Console.WriteLine("Admin login successful.");
-                                adminMenu(admin.AdminID,admin.AName,  adminRepository,  userRepository); // Assuming `adminMenu` is a method to show the admin's menu
+                                adminMenu(admin.AdminID,admin.AName,  adminRepository,  userRepository, bookRepository, categoryRepository); // Assuming `adminMenu` is a method to show the admin's menu
                             }
                             else
                             {
@@ -139,7 +139,7 @@ namespace LibraryManagementSystem
             } while (!ExitFlag);
         }
 
-        static void adminMenu(int adminID, string adminName, AdminRepository adminRepository, UserRepository userRepository)
+        static void adminMenu(int adminID, string adminName, AdminRepository adminRepository, UserRepository userRepository, BookRepository bookRepository, CategoryRepository categoryRepository)
         {
             Console.WriteLine($"Welcome to {adminName} Menu.");
             bool ExitFlag = false;
@@ -157,11 +157,11 @@ namespace LibraryManagementSystem
                 {
                     case "1":
                         Console.Clear();
-                        accountsManagement(adminID,adminName,  adminRepository, userRepository);
+                        accountsManagement(adminID,adminName,  adminRepository, userRepository, bookRepository, categoryRepository);
                         break;
                     case "2":
                         Console.Clear();
-                        BooksManagement(adminID, adminName);
+                        BooksManagement(adminID, adminName, bookRepository, categoryRepository);
                         break;
                     case "0":
                         Console.Clear();
@@ -184,7 +184,7 @@ namespace LibraryManagementSystem
         {
             Console.WriteLine($"Welcome {user.UName} to the User Menu.");
         }
-        static void accountsManagement(int adminID, string adminName, AdminRepository adminRepository, UserRepository userRepository)
+        static void accountsManagement(int adminID, string adminName, AdminRepository adminRepository, UserRepository userRepository, BookRepository bookRepository, CategoryRepository categoryRepository)
         {
             bool ExitFlag = false;
             do
@@ -211,11 +211,11 @@ namespace LibraryManagementSystem
                         break;
                     case "3":
                         Console.Clear();
-                        //RemoveUserAccount();
+                        RemoveUserAccount( adminRepository,  userRepository);
                         break;
                     case "4":
                         Console.Clear();
-                        BooksManagement(adminID, adminName);
+                        BooksManagement(adminID, adminName, bookRepository, categoryRepository);
                         break;
                     case "0":
                         Console.Clear();
@@ -708,7 +708,7 @@ namespace LibraryManagementSystem
         }
 
 
-        static void BooksManagement(int adminID, string adminName)
+        static void BooksManagement(int adminID, string adminName, BookRepository bookRepository, CategoryRepository categoryRepository)
         {
             bool ExitFlag = false;
             do
@@ -729,7 +729,7 @@ namespace LibraryManagementSystem
                 {
                     case "1":
                         Console.Clear();
-                        //AddNewBook();
+                        AddNewBook(bookRepository, categoryRepository);
                         break;
 
                     case "2":
@@ -769,8 +769,112 @@ namespace LibraryManagementSystem
 
             } while (ExitFlag != true);
         }
+        static void AddNewBook(BookRepository bookRepository,CategoryRepository categoryRepository)
+        {
+            string name, author;
+            int copies = 0, allowedBorrowingPeriod = 0, newID;
+            decimal price = 0;
+            int? selectedCategoryID = null;
+
+            Console.WriteLine("|------------ Add New Book ------------|");
+
+            // Input book name
+            while (true)
+            {
+                Console.WriteLine("\nEnter Book Name:");
+                name = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(name)) break;
+                Console.WriteLine("Error: Book name cannot be empty.");
+            }
+
+            // Input book author
+            while (true)
+            {
+                Console.WriteLine("Enter Book Author:");
+                author = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(author)) break;
+                Console.WriteLine("Error: Author name cannot be empty.");
+            }
+
+            // Check if a book with the same name and author already exists
+            var existingBook = bookRepository.GetBooksWithAuthors(name, author);
+            if (existingBook != null)
+            {
+                Console.WriteLine("Error: A book with the same name and author already exists.");
+                return;
+            }
+
+
+            // Input book quantity
+            while (true)
+            {
+                Console.WriteLine("Enter the Book Quantity:");
+                if (int.TryParse(Console.ReadLine(), out copies) && copies >= 0) break;
+                Console.WriteLine("Error: Please enter a valid non-negative number for the Book Quantity.");
+            }
+
+            // Input book price
+            while (true)
+            {
+                Console.WriteLine("Enter the Book Price:");
+                if (decimal.TryParse(Console.ReadLine(), out price) && price >= 0) break;
+                Console.WriteLine("Error: Please enter a valid non-negative number for the Book Price.");
+            }
+
+            // Select book category
+            categoryRepository.GetAll();
+            if (Categories.Count == 0)
+            {
+                Console.WriteLine("Error: No categories available. Please add categories before adding a book.");
+                return;
+            }
+
+            while (true)
+            {
+                Console.WriteLine("Select Book Category:");
+                for (int i = 0; i < Categories.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {Categories[i].CName}");
+                }
+                Console.WriteLine("Enter the number corresponding to the category:");
+                if (int.TryParse(Console.ReadLine(), out int categoryIndex) && categoryIndex >= 1 && categoryIndex <= Categories.Count)
+                {
+                    selectedCategoryID = Categories[categoryIndex - 1].CategoryID;
+                    break;
+                }
+                Console.WriteLine("Error: Invalid category selection.");
+            }
+
+            // Input number of days allowed for borrowing
+            while (true)
+            {
+                Console.WriteLine("Enter the Number of Days Allowed for Borrowing:");
+                if (int.TryParse(Console.ReadLine(), out allowedBorrowingPeriod) && allowedBorrowingPeriod > 0 && allowedBorrowingPeriod <= 365) break;
+                Console.WriteLine("Error: Borrowing period must be a valid number between 1 and 365.");
+            }
+
+            // Create and add the new book
+            var newBook = new Book
+            {
+                BookID = newID,
+                BName = name,
+                Author = author,
+                TotalCopies = copies,
+                Borrowed = 0, // Initially no copies are borrowed
+                CopyPrice = price,
+                AllowedBorrowingPeriod = allowedBorrowingPeriod,
+                CategoryID = selectedCategoryID,
+                Rating = 0, // Default rating
+                Borrowings = new List<Borrowing>(),
+                Purchases = new List<Purchase>()
+            };
+
+            Books.Add(newBook);
+            Console.WriteLine($"Success: The book \"{name}\" by {author} has been added to the library.");
+        }
+
     }
-   
+
 
 
 

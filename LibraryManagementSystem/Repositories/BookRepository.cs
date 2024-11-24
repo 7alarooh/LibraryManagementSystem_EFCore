@@ -170,6 +170,29 @@ namespace LibraryManagementSystem.Repositories
                 .Select(u => (UserId: u.UserId, BorrowCount: u.Count))  // Convert to tuple
                 .ToList();
         }
+        // Method to get books along with their authors' names, with optional filters
+        public List<(string BookName, string AuthorName)> GetBooksWithAuthors(string bookName , string authorName)
+        {
+            var query = _context.Books.AsQueryable();
+
+            // Apply filters if provided
+            if (!string.IsNullOrEmpty(bookName))
+            {
+                query = query.Where(book => book.BName.Contains(bookName, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrEmpty(authorName))
+            {
+                query = query.Where(book => book.Author.Contains(authorName, StringComparison.OrdinalIgnoreCase));
+            }
+
+            // Project to anonymous object, materialize, and map to tuple
+            return query
+                .Select(book => new { BookName = book.BName, AuthorName = book.Author }) // Use anonymous object
+                .ToList() // Materialize the results
+                .Select(book => (book.BookName, book.AuthorName)) // Map to tuple
+                .ToList(); // Convert to a List of tuples
+        }
 
 
         // Get books with high ratings (4-5)
