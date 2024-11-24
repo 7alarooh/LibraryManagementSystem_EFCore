@@ -15,13 +15,19 @@ namespace LibraryManagementSystem
         public string Email { get; set; }
         public string Password { get; set; }
     }
-
+    public enum Gender
+    {
+        Male,
+        Female,
+        Other
+    }
     public class User
     {
         public int UID { get; set; }
         public string Uname { get; set; }
+        public string Email { get; set; }
+        public Gender Gender { get; set; } // Enum type
         public string Passcode { get; set; }
-        public string Gender { get; set; }
     }
     public class Program
     {
@@ -71,7 +77,7 @@ namespace LibraryManagementSystem
                             if (enterPW == admin.Password)
                             {
                                 Console.WriteLine("Admin login successful.");
-                                adminMenu(admin.AdminID,admin.AName); // Assuming `adminMenu` is a method to show the admin's menu
+                                adminMenu(admin.AdminID,admin.AName,  adminRepository,  userRepository); // Assuming `adminMenu` is a method to show the admin's menu
                             }
                             else
                             {
@@ -133,6 +139,8 @@ namespace LibraryManagementSystem
                         Console.ReadLine();
                         ExitFlag = true; // Exit the loop
                         break;
+                    case "0":
+                        break;
 
                     default:
                         Console.WriteLine("Sorry, your choice was wrong!!");
@@ -150,7 +158,7 @@ namespace LibraryManagementSystem
             } while (!ExitFlag);
         }
 
-        static void adminMenu(int adminID, string adminName)
+        static void adminMenu(int adminID, string adminName, AdminRepository adminRepository, UserRepository userRepository)
         {
             Console.WriteLine($"Welcome to {adminName} Menu.");
             bool ExitFlag = false;
@@ -168,7 +176,7 @@ namespace LibraryManagementSystem
                 {
                     case "1":
                         Console.Clear();
-                        accountsManagement(adminID,adminName);
+                        accountsManagement(adminID,adminName,  adminRepository, userRepository);
                         break;
                     case "2":
                         Console.Clear();
@@ -197,7 +205,7 @@ namespace LibraryManagementSystem
             Console.WriteLine($"Welcome {user.Uname} to the User Menu.");
             // Add more user operations here
         }
-        static void accountsManagement(int adminID, string adminName)
+        static void accountsManagement(int adminID, string adminName, AdminRepository adminRepository, UserRepository userRepository)
         {
             bool ExitFlag = false;
             do
@@ -220,7 +228,7 @@ namespace LibraryManagementSystem
                         break;
                     case "2":
                         Console.Clear();
-                        EditUserInformation();
+                        EditUserInformation(adminRepository, userRepository);
                         break;
                     case "3":
                         Console.Clear();
@@ -275,7 +283,7 @@ namespace LibraryManagementSystem
                     break;
             }
         }
-
+        
         public static void AddUser(UserRepository userRepository)
         {
             // Take user inputs
@@ -297,7 +305,7 @@ namespace LibraryManagementSystem
             var newUser = new User
             {
                 Uname = userName,
-                gender = gender,
+                Gender = gender,
                 Passcode = passcode
             };
 
@@ -316,6 +324,8 @@ namespace LibraryManagementSystem
 
             // If validation passes, add user to the database
             userRepository.AddUser(newUser); // Use the AddUser method we created
+            userRepository.SaveChanges();
+
             Console.WriteLine("User added successfully.");
         }
 
@@ -381,11 +391,11 @@ namespace LibraryManagementSystem
             return validationResults;
         }
         //             edit user
-        static void EditUserInformation()
+        static void EditUserInformation(AdminRepository adminRepository, UserRepository userRepository)
         {
 
             Console.WriteLine("Edit User Information");
-            ViewAllUsers(adminRepository);
+            ViewAllUsers(adminRepository, userRepository);
             Console.WriteLine("Enter the type of account to edit (user/admin):");
             string accountType = Console.ReadLine().ToLower();
 
@@ -402,7 +412,7 @@ namespace LibraryManagementSystem
                     break;
             }
         }
-        static void ViewAllUsers(AdminRepository adminRepository)
+        static void ViewAllUsers(AdminRepository adminRepository, UserRepository userRepository)
         {
             List<Admin> Admins = new List<Admin>();  // Declare it somewhere in your class or program.
             var admins = adminRepository.GetAll(); // Example fetching all admins from repository
@@ -437,7 +447,8 @@ namespace LibraryManagementSystem
                                 admin.Password);  // Admin password
                 sb.AppendLine();
             }
-
+            List<User> Users = new List<User>();  // Declare it somewhere in your class or program.
+            var users = userRepository.GetAll();
             // Print Users
             sb.AppendLine("\n\n\t--- Users ---");
             sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + nameWidth + "} {2,-" + emailWidth + "} {3,-" + passwordWidth + "}",
@@ -446,7 +457,7 @@ namespace LibraryManagementSystem
             sb.AppendLine(new string('-', idWidth + nameWidth + emailWidth + passwordWidth + 12)); // Separator line
 
             // Assuming 'Users' is a list of user objects, iterate over them
-            foreach (var user in Users)
+            foreach (var user in users)
             {
                 sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + nameWidth + "} {2,-" + emailWidth + "} {3,-" + passwordWidth + "}",
                                 user.UID,         // Assuming User has UID
