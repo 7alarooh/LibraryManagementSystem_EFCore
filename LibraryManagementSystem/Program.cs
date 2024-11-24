@@ -519,6 +519,122 @@ namespace LibraryManagementSystem
             adminRepository.UpdateAdmin(admin);
             Console.WriteLine("Admin details updated successfully.");
         }
+        //              delete
+        static void RemoveUserAccount(AdminRepository adminRepository, UserRepository userRepository)
+        {
+            Console.WriteLine("Displaying all users and admins:");
+            ViewAllUsers(adminRepository, userRepository); // Assuming this function lists both Users and Admins
+
+            Console.WriteLine("Enter the type of account to remove (user/admin):");
+            string accountType = Console.ReadLine().ToLower().Trim();
+
+            switch (accountType)
+            {
+                case "user":
+                    RemoveUser(userRepository);
+                    break;
+                case "admin":
+                    RemoveAdmin(adminRepository);
+                    break;
+                default:
+                    Console.WriteLine("Error: Invalid account type. Please enter 'user' or 'admin'.");
+                    break;
+            }
+        }
+
+        static void RemoveUser( UserRepository userRepository)
+        {
+            try
+            {
+                Console.WriteLine("Enter the User ID of the user you want to remove:");
+                if (!int.TryParse(Console.ReadLine(), out int userId))
+                {
+                    Console.WriteLine("Error: Invalid ID format. Please enter a numeric value.");
+                    return;
+                }
+
+                var user = userRepository.GetAllUsers().Find(u => u.UserID == userId);
+
+                if (user == null)
+                {
+                    Console.WriteLine($"Error: User with ID {userId} not found.");
+                    return;
+                }
+
+                Console.WriteLine($"Confirm removal of User ID {userId}:");
+                Console.WriteLine($"ID: {user.UserID}");
+                Console.WriteLine($"Name: {user.UName}");
+                Console.WriteLine("Are you sure you want to remove this user? (y/n)");
+                string confirmation = Console.ReadLine()?.ToLower().Trim();
+
+                if (confirmation == "y")
+                {
+                     userRepository.DeleteById(userId);
+                    Console.WriteLine("User removed successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("User removal canceled.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred while removing the user: " + ex.Message);
+            }
+        }
+
+        static void RemoveAdmin(AdminRepository adminRepository)
+        {
+            try
+            {
+                Console.WriteLine("Enter the email of the admin you want to remove:");
+                string email = Console.ReadLine()?.Trim();
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    Console.WriteLine("Error: Email cannot be empty.");
+                    return;
+                }
+
+                // Prevent the removal of the "registrar" admin
+                if (email.Equals("eve.davis@example.com", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("Error: The 'registrar' admin cannot be removed.");
+                    return;
+                }
+
+                var admin = adminRepository.GetAllAdmins().Find(a => a.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+
+                if (admin == null)
+                {
+                    Console.WriteLine($"Error: Admin with email {email} not found.");
+                    return;
+                }
+
+                Console.WriteLine($"Confirm removal of Admin with Email {email}:");
+                Console.WriteLine($"ID: {admin.AdminID}");
+                Console.WriteLine($"Name: {admin.AName}");
+                Console.WriteLine("Are you sure you want to remove this admin? (y/n)");
+                string confirmation = Console.ReadLine()?.ToLower().Trim();
+
+                if (confirmation == "y")
+                {
+                    adminRepository.DeleteById(admin.AdminID);
+
+
+                    Console.WriteLine("Admin removed successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("Admin removal canceled.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred while removing the admin: " + ex.Message);
+            }
+        }
+
 
         // Helper function to validate email format
         public static bool IsValidEmail(string email)

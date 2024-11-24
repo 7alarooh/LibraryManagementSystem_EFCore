@@ -80,6 +80,19 @@ namespace LibraryManagementSystem.Repositories
         {
             return _context.Admins.ToList();
         }
+        public void DeleteById(int adminID)
+        {
+            var admin = _context.Users.Find(adminID);
+            if (admin != null)
+            {
+                _context.Users.Remove(admin);
+                _context.SaveChanges();
+            }
+            else
+            {
+                Console.WriteLine("User not found.");
+            }
+        }
 
         // Method to count the total number of admins
         public int GetTotalAdmins()
